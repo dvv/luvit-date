@@ -3,6 +3,7 @@ local os = require('os')
 
 local formats = {
   '%Y-%m-%d %H:%M:%S',
+  '%a, %d %b %y %H:%M:%S',
   '%a, %b %d %y %H:%M:%S',
   '%a, %b %d %Y %H:%M:%S',
   '%Y-%m-%dT%H:%M:%SZ%z',
@@ -27,12 +28,15 @@ function Date.parse(x, dont_offset)
         remainder = '20120101000000' .. remainder:gsub('GMT', 'UTC')
         -- parse dummy date, to extract UTC offset
         local offset = Date.strptime(remainder, '%Y%m%d%H%M%S UTC%z')
+        --p(remainder, offset)
         -- compensate the date for GMT offset, unless prohibited
-        if not dont_offset then
-          date = Date.parse(os.time(date) - offset.gmtoff)
-        -- or just fill date.gmtoff field
-        else
-          date.gmtoff = offset.gmtoff
+        if offset then
+          if not dont_offset then
+            date = Date.parse(os.time(date) - offset.gmtoff)
+          -- or just fill date.gmtoff field
+          else
+            date.gmtoff = offset.gmtoff
+          end
         end
       end
       return date
@@ -43,7 +47,7 @@ end
 function Date.format(date, fmt)
   date = Date.parse(date)
   if date then
-    return os.date(fmt, os.time(date))
+    return os.date(fmt or '%a, %d %b %y %H:%M:%S GMT', os.time(date))
   end
 end
 

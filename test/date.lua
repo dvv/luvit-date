@@ -169,6 +169,10 @@ end
 
 exports['format() is sane'] = function (test)
   test.equal(Date.format(d20121231235959_o3, '%Y%m%d%H%M%S%z'), '20121231235959+0000')
+  test.equal(Date.format(d19991231000102), 'Fri, 31 Dec 99 00:01:02 GMT')
+  -- FIXME: so, 31.12.1999 is Friday or Sunday?!
+  --test.equal(Date.parse('Fri, 31 Dec 99 00:01:02 GMT'), d19991231000102)
+  test.equal(Date.parse('Sun, 31 Dec 99 00:01:02 GMT'), d19991231000102)
   test.done()
 end
 

@@ -62,9 +62,55 @@ static int l_strptime(lua_State * L) {
   return 1;
 }
 
+#if 0
+static int l_strftime(lua_State * L) {
+
+  struct tm tm;
+  luaL_checktype(L, 1, LUA_TTABLE); /* tm */
+  lua_rawgeti(L, -1, i + 1);
+  /*
+    env[i] = (char*)lua_tostring(L, -1);
+    lua_pop(L, 1);
+  */
+  lua_pop(L, 1);
+  const char *format = luaL_checkstring(L, 2);
+
+  memset(&tm, 0, sizeof(tm));
+
+  stop = strptime(date, format, &tm);
+  /* failed to parse? return nil, false */
+  if (!stop) {
+    lua_pushnil(L);
+    lua_pushboolean(L, 0);
+    return 2;
+  }
+
+  lua_createtable(L, 0, 10);  /* 10 = number of fields */
+  setfield(L, "sec", tm.tm_sec);
+  setfield(L, "min", tm.tm_min);
+  setfield(L, "hour", tm.tm_hour);
+  setfield(L, "day", tm.tm_mday);
+  setfield(L, "month", tm.tm_mon + 1);
+  setfield(L, "year", tm.tm_year + 1900);
+  setfield(L, "wday", tm.tm_wday + 1);
+  setfield(L, "yday", tm.tm_yday + 1);
+  setboolfield(L, "isdst", tm.tm_isdst);
+  setfield(L, "gmtoff", tm.tm_gmtoff);
+
+  /* if not parsed whole format, return the remainder as well */
+  if (*stop) {
+    lua_pushstring(L, stop);
+    return 2;
+  }
+
+  return 1;
+}
+#endif
+
 /* Lua module API */
 static const struct luaL_reg exports[] = {
   { "strptime", l_strptime },
+  /*{ "strftime", l_strftime },*/
   { NULL, NULL }
 };
 

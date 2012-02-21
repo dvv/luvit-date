@@ -3,9 +3,10 @@ local os = require('os')
 
 local formats = {
   '%Y-%m-%d %H:%M:%S',
-  '%a, %d %b %y %H:%M:%S',
-  '%a, %b %d %y %H:%M:%S',
-  '%a, %b %d %Y %H:%M:%S',
+  '%a %d %b %y %H:%M:%S',
+  '%a %b %d %y %H:%M:%S',
+  '%a %d %b %Y %H:%M:%S',
+  '%a %b %d %Y %H:%M:%S',
   '%Y-%m-%dT%H:%M:%SZ%z',
   '%Y-%m-%dT%H:%M:%S',
   '%b %d %y %H:%M:%S',
@@ -18,6 +19,7 @@ function Date.parse(x, dont_offset)
   if type(x) == 'table' then return x end
   if type(x) == 'number' then return Date.strptime(tostring(x), '%s') end
   if type(x) ~= 'string' then return end
+  x = x:gsub(',', '')
   local date, remainder
   for i = 1, #formats do
     date, remainder = Date.strptime(x, formats[i])

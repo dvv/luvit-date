@@ -2,26 +2,15 @@ local Date = require('./build/date')
 local os = require('os')
 
 local formats = {
-  '%Y-%m-%d %H:%M:%S UTC%z',
-  '%a, %b %d %y %H:%M:%S GMT%z',
-  '%a, %b %d %y %H:%M:%S UTC%z',
-  '%a, %b %d %y %H:%M:%S',
-  '%a, %b %d %Y %H:%M:%S GMT%z',
-  '%a, %b %d %Y %H:%M:%S UTC%z',
-  '%a, %b %d %Y %H:%M:%S',
-  '%Y-%m-%d %H:%M:%S GMT%z',
   '%Y-%m-%d %H:%M:%S',
+  '%a, %b %d %y %H:%M:%S',
+  '%a, %b %d %Y %H:%M:%S',
   '%Y-%m-%dT%H:%M:%SZ%z',
   '%Y-%m-%dT%H:%M:%S',
-  '%b %d %y %H:%M:%S GMT%z',
-  '%b %d %y %H:%M:%S UTC%z',
   '%b %d %y %H:%M:%S',
-  '%b %d %H:%M:%S GMT%z %Y',
-  '%b %d %H:%M:%S UTC%z %Y',
   '%b %d %H:%M:%S %Y',
-  '%a %b %d %H:%M:%S GMT%z %Y',
-  '%a %b %d %H:%M:%S UTC%z %Y',
   '%a %b %d %H:%M:%S %Y',
+  -- what else we missed?
 }
 
 function Date.parse(x, dont_offset)
@@ -32,14 +21,21 @@ function Date.parse(x, dont_offset)
   for i = 1, #formats do
     date, remainder = Date.strptime(x, formats[i])
     if date then
-      --if remainder then print('[' .. x:sub(-#remainder) .. ']') end
-      if not remainder or x:sub(-#remainder) == remainder then
-        -- compensate for GMT offset
-        if date.gmtoff and not dont_offset then
-          date = Date.parse(os.time(date) - date.gmtoff)
+      -- process remainder of form GMT+-hhmm, UTC+-hhmm
+      if remainder then
+        -- compose dummy date of simple format with the unparsed remainder
+        remainder = '20120101000000' .. remainder:gsub('GMT', 'UTC')
+        -- parse dummy date, to extract UTC offset
+        local offset = Date.strptime(remainder, '%Y%m%d%H%M%S UTC%z')
+        -- compensate the date for GMT offset, unless prohibited
+        if not dont_offset then
+          date = Date.parse(os.time(date) - offset.gmtoff)
+        -- or just fill date.gmtoff field
+        else
+          date.gmtoff = offset.gmtoff
         end
-        return date
       end
+      return date
     end
   end
 end

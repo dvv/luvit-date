@@ -24,7 +24,7 @@ local formats = {
   '%a %b %d %H:%M:%S %Y',
 }
 
-function Date.parse(x)
+function Date.parse(x, dont_offset)
   if type(x) == 'table' then return x end
   if type(x) == 'number' then return Date.strptime(tostring(x), '%s') end
   if type(x) ~= 'string' then return end
@@ -34,7 +34,11 @@ function Date.parse(x)
     if date then
       --if remainder then print('[' .. x:sub(-#remainder) .. ']') end
       if not remainder or x:sub(-#remainder) == remainder then
-        return date, formats[i]
+        -- compensate for GMT offset
+        if date.gmtoff and not dont_offset then
+          date = Date.parse(os.time(date) - date.gmtoff)
+        end
+        return date
       end
     end
   end

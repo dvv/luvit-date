@@ -15,17 +15,30 @@ local d19991231000102 = {
   hour = 0
 }
 
-local d19991231000102_m4 = {
+local d19991231000102_o4 = {
   sec = 2,
   min = 1,
   day = 31,
-  gmtoff = -14400,
+  gmtoff = 14400,
   isdst = false,
   wday = 1,
   yday = 365,
   year = 1999,
   month = 12,
   hour = 0
+}
+
+local d19991231000102_m4 = {
+  sec = 2,
+  min = 1,
+  day = 30,
+  gmtoff = 0,
+  isdst = false,
+  wday = 5,
+  yday = 364,
+  year = 1999,
+  month = 12,
+  hour = 20
 }
 
 local d20120221010203 = {
@@ -41,7 +54,7 @@ local d20120221010203 = {
   hour = 1
 }
 
-local d20120221010203_m4 = {
+local d20120221010203_o4 = {
   sec = 3,
   min = 2,
   day = 21,
@@ -54,7 +67,20 @@ local d20120221010203_m4 = {
   hour = 1
 }
 
-local d20121231235959_p3 = {
+local d20120221010203_m4 = {
+  sec = 3,
+  min = 2,
+  day = 20,
+  gmtoff = 0,
+  isdst = false,
+  wday = 2,
+  yday = 51,
+  year = 2012,
+  month = 2,
+  hour = 21
+}
+
+local d20121231235959_o3 = {
   sec = 59,
   min = 59,
   day = 31,
@@ -65,6 +91,19 @@ local d20121231235959_p3 = {
   year = 2012,
   month = 12,
   hour = 23
+}
+
+local d20121231235959_p3 = {
+  sec = 59,
+  min = 59,
+  day = 1,
+  gmtoff = 0,
+  isdst = false,
+  wday = 3,
+  yday = 1,
+  year = 2013,
+  month = 1,
+  hour = 2
 }
 
 exports['ISO date'] = function (test)
@@ -91,16 +130,17 @@ exports['unix date'] = function (test)
 end
 
 exports['RFC6265 date'] = function (test)
-  test.equal(Date.parse('Tue, Feb 21 2012 01:02:03 GMT-04'), d20120221010203_m4)
+  test.equal(Date.parse('Tue, Feb 21 2012 01:02:03 GMT+04'), d20120221010203_m4)
   test.equal(Date.parse('Tue, Feb 21 12 1:2:3'), d20120221010203)
-  test.equal(Date.parse('Sun, Dec 31 99 0:1:2 UTC-0400'), d19991231000102_m4)
+  test.equal(Date.parse('Sun, Dec 31 99 0:1:2 UTC+0400'), d19991231000102_m4)
+  test.equal(Date.parse('Sun, Dec 31 99 0:1:2 UTC+0400', true), d19991231000102_o4)
   test.is_nil(Date.parse('Пн, Дек 31 99 0:1:2'))
   test.done()
 end
 
 exports['RFC6265 date fallbacks to ISO'] = function (test)
-  local date, err = Date.parse('2012-12-31 23:59:59 GMT+0300')
-  test.equal(date, d20121231235959_p3)
+  test.equal(Date.parse('2012-12-31 23:59:59 GMT-0300'), d20121231235959_p3)
+  test.equal(Date.parse('2012-12-31 23:59:59 GMT+0300', true), d20121231235959_o3)
   test.done()
 end
 
@@ -112,7 +152,7 @@ end
 
 exports['diff() is sane'] = function (test)
   test.equal(Date.diff('2013-12-12T00:00:01', 'Thu, Dec 12 2013 01:00:00'), 3599)
-  test.equal(Date.diff('2013-12-12T00:00:01', 'Thu, Dec 12 2013 01:00:00'), 3599)
+  test.equal(Date.diff('Thu, Dec 12 2013 01:00:00', '2013-12-12T00:00:01'), -3599)
   test.done()
 end
 
@@ -128,7 +168,7 @@ exports['add() is sane'] = function (test)
 end
 
 exports['format() is sane'] = function (test)
-  test.equal(Date.format(d20121231235959_p3, '%Y%m%d%H%M%S%z'), '20121231235959+0000')
+  test.equal(Date.format(d20121231235959_o3, '%Y%m%d%H%M%S%z'), '20121231235959+0000')
   test.done()
 end
 

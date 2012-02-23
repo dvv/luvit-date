@@ -9,6 +9,7 @@
 
 #include <string.h> /* memset */
 
+/* N.B. inclusion of strptime depends on this define */
 #define __USE_XOPEN
 #include <time.h> /* strptime, strftime */
 
@@ -30,6 +31,7 @@ static int l_strptime(lua_State * L) {
   const char *format = luaL_checkstring(L, 2);
   char *stop;
   struct tm tm;
+  time_t time;
 
   memset(&tm, 0, sizeof(tm));
 
@@ -41,7 +43,14 @@ static int l_strptime(lua_State * L) {
     return 2;
   }
 
-  lua_createtable(L, 0, 10);  /* 10 = number of fields */
+  /* compensate for GMT offset */
+  if (tm.tm_gmtoff) {
+    time = mktime(&tm);
+    time += tm.tm_gmtoff;
+    gmtime_r(&time, &tm);
+  }
+
+  lua_createtable(L, 0, 9);  /* 9 = number of fields */
   setfield(L, "sec", tm.tm_sec);
   setfield(L, "min", tm.tm_min);
   setfield(L, "hour", tm.tm_hour);
@@ -51,7 +60,6 @@ static int l_strptime(lua_State * L) {
   setfield(L, "wday", tm.tm_wday + 1);
   setfield(L, "yday", tm.tm_yday + 1);
   setboolfield(L, "isdst", tm.tm_isdst);
-  setfield(L, "gmtoff", tm.tm_gmtoff);
 
   /* if not parsed whole format, return the remainder as well */
   if (*stop) {

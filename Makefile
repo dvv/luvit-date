@@ -6,7 +6,7 @@ build/date.luvit: src/date.c
 	mkdir -p build
 	gcc -shared -g $(CFLAGS) -o $@ $^
 
-test:
+test: all
 	checkit test/date.lua
 
 .PHONY: all test

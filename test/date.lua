@@ -1,12 +1,12 @@
 local exports = {}
 
+local os = require('os')
 local Date = require('../')
 
 local d19991231000102 = {
   sec = 2,
   min = 1,
   day = 31,
-  gmtoff = 0,
   isdst = false,
   wday = 1,
   yday = 365,
@@ -19,7 +19,6 @@ local d19991231000102_o4 = {
   sec = 2,
   min = 1,
   day = 31,
-  gmtoff = 14400,
   isdst = false,
   wday = 1,
   yday = 365,
@@ -32,7 +31,6 @@ local d19991231000102_m4 = {
   sec = 2,
   min = 1,
   day = 30,
-  gmtoff = 0,
   isdst = false,
   wday = 5,
   yday = 364,
@@ -45,7 +43,6 @@ local d20120221010203 = {
   sec = 3,
   min = 2,
   day = 21,
-  gmtoff = 0,
   isdst = false,
   wday = 3,
   yday = 52,
@@ -58,7 +55,6 @@ local d20120221010203_o4 = {
   sec = 3,
   min = 2,
   day = 21,
-  gmtoff = -14400,
   isdst = false,
   wday = 3,
   yday = 52,
@@ -71,7 +67,6 @@ local d20120221010203_m4 = {
   sec = 3,
   min = 2,
   day = 20,
-  gmtoff = 0,
   isdst = false,
   wday = 2,
   yday = 51,
@@ -84,7 +79,6 @@ local d20121231235959_o3 = {
   sec = 59,
   min = 59,
   day = 31,
-  gmtoff = 10800,
   isdst = false,
   wday = 2,
   yday = 366,
@@ -97,7 +91,6 @@ local d20121231235959_p3 = {
   sec = 59,
   min = 59,
   day = 1,
-  gmtoff = 0,
   isdst = false,
   wday = 3,
   yday = 1,
@@ -106,13 +99,35 @@ local d20121231235959_p3 = {
   hour = 2
 }
 
+exports['strptime is sane'] = function (test)
+  --
+  local ts = os.time()
+  local s = os.date('%c %Z', ts)
+  test.equal(os.time(Date.strptime(s, '%c %Z')), ts)
+  --
+  ts = os.time()
+  s = os.date('%c %Z', ts)
+  local expected = os.date('*t', ts)
+  test.equal(Date.strptime(s, '%c %Z'), expected)
+  --
+  ts = os.time()
+  s = os.date('%c', ts)
+  test.equal(os.time(Date.strptime(s, '%c')), ts)
+  --
+  ts = os.time()
+  s = os.date('%c', ts)
+  expected = os.date('*t', ts)
+  test.equal(Date.strptime(s, '%c'), expected)
+  -- strptime reports same what os.date() reports
+  test.equal(os.date('*t', 1329820391), Date.strptime('1329820391', '%s'))
+  test.done()
+end
+
 exports['ISO date'] = function (test)
   local date, err = Date.strptime(
       '2012-02-21 01:02:03 -0300',
       '%Y-%m-%d %H:%M:%S %z'
     )
-  test.equal(date.gmtoff, -10800)
-  date.gmtoff = 0
   test.equal(date, d20120221010203)
   date, err = Date.strptime(
       '2012-02-21 01:02:03 GMT+03',
@@ -125,7 +140,7 @@ exports['ISO date'] = function (test)
 end
 
 exports['unix date'] = function (test)
-  test.equal(Date.parse('Tue Feb 21 10:33:11 2012'), Date.parse(1329820391))
+  test.equal(Date.parse('Tue Feb 21 14:33:11 2012'), Date.parse(1329820391))
   test.done()
 end
 

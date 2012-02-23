@@ -32,14 +32,14 @@ function Date.parse(x, dont_offset)
         local offset = Date.strptime(remainder, '%Y%m%d%H%M%S UTC%z')
         --p(remainder, offset)
         -- compensate the date for GMT offset, unless prohibited
-        if offset then
+        --[[if offset then
           if not dont_offset then
             date = Date.parse(os.time(date) - offset.gmtoff)
           -- or just fill date.gmtoff field
           else
             date.gmtoff = offset.gmtoff
           end
-        end
+        end]]--
       end
       return date
     end

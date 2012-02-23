@@ -3,102 +3,6 @@ local exports = {}
 local os = require('os')
 local Date = require('../')
 
-local d19991231000102 = {
-  sec = 2,
-  min = 1,
-  day = 31,
-  isdst = false,
-  wday = 1,
-  yday = 365,
-  year = 1999,
-  month = 12,
-  hour = 0
-}
-
-local d19991231000102_o4 = {
-  sec = 2,
-  min = 1,
-  day = 31,
-  isdst = false,
-  wday = 1,
-  yday = 365,
-  year = 1999,
-  month = 12,
-  hour = 0
-}
-
-local d19991231000102_m4 = {
-  sec = 2,
-  min = 1,
-  day = 30,
-  isdst = false,
-  wday = 5,
-  yday = 364,
-  year = 1999,
-  month = 12,
-  hour = 20
-}
-
-local d20120221010203 = {
-  sec = 3,
-  min = 2,
-  day = 21,
-  isdst = false,
-  wday = 3,
-  yday = 52,
-  year = 2012,
-  month = 2,
-  hour = 1
-}
-
-local d20120221010203_o4 = {
-  sec = 3,
-  min = 2,
-  day = 21,
-  isdst = false,
-  wday = 3,
-  yday = 52,
-  year = 2012,
-  month = 2,
-  hour = 1
-}
-
-local d20120221010203_m4 = {
-  sec = 3,
-  min = 2,
-  day = 20,
-  isdst = false,
-  wday = 2,
-  yday = 51,
-  year = 2012,
-  month = 2,
-  hour = 21
-}
-
-local d20121231235959_o3 = {
-  sec = 59,
-  min = 59,
-  day = 31,
-  isdst = false,
-  wday = 2,
-  yday = 366,
-  year = 2012,
-  month = 12,
-  hour = 23
-}
-
-local d20121231235959_p3 = {
-  sec = 59,
-  min = 59,
-  day = 1,
-  isdst = false,
-  wday = 3,
-  yday = 1,
-  year = 2013,
-  month = 1,
-  hour = 2
-}
-
 exports['strptime is sane'] = function (test)
   --
   local ts = os.time()
@@ -173,6 +77,7 @@ end
 
 exports['add() is sane'] = function (test)
   local date = Date.add('2013-12-12T23:00:01', 100000)
+  date = os.date('*t', date)
   test.equal(date.year, 2013)
   test.equal(date.month, 12)
   test.equal(date.day, 14)

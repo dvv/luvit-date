@@ -16,8 +16,8 @@ local formats = {
 }
 
 function Date.parse(x, dont_offset)
-  if type(x) == 'table' then return x end
   if type(x) == 'number' then return Date.strptime(tostring(x), '%s') end
+  if type(x) == 'table' then return x end
   if type(x) ~= 'string' then return end
   x = x:gsub(',', '')
   local date, remainder
@@ -49,7 +49,7 @@ end
 function Date.format(date, fmt)
   date = Date.parse(date)
   if date then
-    return os.date(fmt or '%a, %d %b %y %H:%M:%S GMT', os.time(date))
+    return os.date(fmt or '%a, %d %b %y %H:%M:%S GMT', date)
   end
 end
 
@@ -61,13 +61,13 @@ function Date.diff(d1, d2)
   d1 = Date.parse(d1)
   d2 = Date.parse(d2)
   if not d1 or not d2 then return end
-  return os.time(d2) - os.time(d1)
+  return d2 - d1
 end
 
 function Date.add(date, delta)
   date = Date.parse(date)
   if date then
-    return Date.parse(os.time(date) + delta)
+    return Date.parse(date + delta)
   end
 end
 
